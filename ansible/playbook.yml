@@ -1,0 +1,27 @@
+---
+# playbook.yml
+- hosts: all
+  become: yes
+  vars:
+    username: "packer"
+    password: "P@ck3r"
+  tasks:
+    - name: Install Packages
+      ansible.builtin.package:
+        name: "{{ item }}"
+        state: present
+      with_items:
+        - nano
+
+    - name: Add users to sudo
+      lineinfile:
+        path: "/etc/sudoers.d/{{ username }}"
+        line: "{{ username }} ALL=(ALL) NOPASSWD: ALL"
+        state: present
+        mode: 0440
+        create: yes
+        validate: 'visudo -cf %s'
+
+    - name: Set timezone.
+      timezone:
+        name: "America/Los_Angeles"
